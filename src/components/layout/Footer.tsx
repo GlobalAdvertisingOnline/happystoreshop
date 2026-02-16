@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { Package, Mail, Phone, Clock } from "lucide-react";
+import { Mail, Phone, Clock } from "lucide-react";
 import { COMPANY, NAV_LINKS, LEGAL_LINKS } from "@/lib/constants";
+import { LogoFull } from "@/components/ui/Logo";
 
 export function Footer() {
   return (
@@ -9,13 +10,8 @@ export function Footer() {
         <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4">
           {/* Brand */}
           <div className="space-y-4">
-            <Link href="/" className="flex items-center gap-2.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-blue">
-                <Package className="h-4.5 w-4.5 text-white" />
-              </div>
-              <span className="text-lg font-bold text-white">
-                Happy<span className="text-brand-blue-light">Store</span>Shop
-              </span>
+            <Link href="/" className="flex items-center">
+              <LogoFull iconClassName="h-9 w-9" textClassName="text-lg text-white" />
             </Link>
             <p className="text-sm leading-relaxed text-slate-400">
               Your trusted online shopping partner. Delivering quality products

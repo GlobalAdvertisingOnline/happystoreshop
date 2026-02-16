@@ -14,12 +14,13 @@ export function ContactForm() {
     const data = new FormData(form);
 
     try {
-      const res = await fetch("https://formspree.io/f/xpwdjqkl", {
+      const res = await fetch("https://formsubmit.co/ajax/support@happystoreshop.com", {
         method: "POST",
-        body: data,
         headers: { Accept: "application/json" },
+        body: data,
       });
-      if (res.ok) {
+      const json = await res.json();
+      if (json.success === "true" || json.success === true || res.ok) {
         setStatus("success");
         form.reset();
       } else {
@@ -51,6 +52,13 @@ export function ContactForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
+      {/* Honeypot for spam protection */}
+      <input type="text" name="_honey" className="hidden" />
+      {/* Disable captcha page redirect */}
+      <input type="hidden" name="_captcha" value="false" />
+      <input type="hidden" name="_template" value="table" />
+      <input type="hidden" name="_subject" value="New message from HappyStoreShop contact form" />
+
       <div className="grid gap-5 sm:grid-cols-2">
         <div>
           <label
@@ -145,7 +153,7 @@ export function ContactForm() {
       {status === "error" && (
         <div className="flex items-center gap-2 rounded-lg border border-brand-red/20 bg-red-50 px-4 py-3 text-sm text-brand-red">
           <AlertCircle className="h-4 w-4 shrink-0" />
-          Something went wrong. Please try again or email us directly.
+          Something went wrong. Please try again or email us directly at support@happystoreshop.com.
         </div>
       )}
 

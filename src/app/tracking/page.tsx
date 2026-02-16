@@ -42,17 +42,22 @@ export default function TrackingPage() {
             <Truck className="h-4 w-4" />
             Supported Carriers
           </div>
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-4 md:gap-6">
-            {["USPS", "UPS", "FedEx", "DHL", "China Post", "Royal Mail"].map(
-              (carrier) => (
-                <div
-                  key={carrier}
-                  className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm"
-                >
-                  {carrier}
-                </div>
-              )
-            )}
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-3 md:gap-4">
+            {[
+              { name: "USPS", bg: "bg-[#333366]", text: "text-white" },
+              { name: "UPS", bg: "bg-[#351C15]", text: "text-[#FFB500]" },
+              { name: "FedEx", bg: "bg-[#4D148C]", text: "text-white" },
+              { name: "DHL", bg: "bg-[#FFCC00]", text: "text-[#D40511]" },
+              { name: "China Post", bg: "bg-[#006633]", text: "text-white" },
+              { name: "Royal Mail", bg: "bg-[#D4351C]", text: "text-white" },
+            ].map((carrier) => (
+              <div
+                key={carrier.name}
+                className={`rounded-lg px-4 py-2 text-sm font-bold shadow-sm ${carrier.bg} ${carrier.text}`}
+              >
+                {carrier.name}
+              </div>
+            ))}
             <div className="rounded-lg border border-brand-blue/20 bg-brand-blue/5 px-4 py-2 text-sm font-semibold text-brand-blue">
               1,500+ More
             </div>

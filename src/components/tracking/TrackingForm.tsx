@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import Script from "next/script";
-import { Search, Loader2 } from "lucide-react";
+import { Search, Loader2, ExternalLink } from "lucide-react";
 
 declare global {
   interface Window {
@@ -21,32 +21,62 @@ export function TrackingForm() {
   const [trackingNumber, setTrackingNumber] = useState("");
   const [loading, setLoading] = useState(false);
   const [tracked, setTracked] = useState(false);
-  const [scriptLoaded, setScriptLoaded] = useState(false);
+  const [scriptReady, setScriptReady] = useState(false);
+
+  const handleScriptLoad = useCallback(() => {
+    // The script is loaded, but YQV5 might need a moment to initialize
+    const check = () => {
+      if (window.YQV5) {
+        setScriptReady(true);
+      } else {
+        setTimeout(check, 200);
+      }
+    };
+    check();
+  }, []);
 
   const handleTrack = (e: React.FormEvent) => {
     e.preventDefault();
     const num = trackingNumber.trim();
     if (num.length < 5) return;
 
-    if (window.YQV5) {
-      setLoading(true);
-      setTracked(true);
-      window.YQV5.trackSingle({
-        YQ_ContainerId: "YQContainer",
-        YQ_Height: 560,
-        YQ_Lang: "en",
-        YQ_Num: num,
-      });
+    setLoading(true);
+    setTracked(true);
+
+    if (scriptReady && window.YQV5) {
+      // Use the embedded 17TRACK widget
+      try {
+        window.YQV5.trackSingle({
+          YQ_ContainerId: "YQContainer",
+          YQ_Height: 560,
+          YQ_Lang: "en",
+          YQ_Num: num,
+        });
+      } catch {
+        // If widget fails, open 17TRACK in new tab
+        window.open(`https://t.17track.net/en#nums=${encodeURIComponent(num)}`, "_blank");
+      }
       setTimeout(() => setLoading(false), 2000);
+    } else {
+      // Fallback: open 17TRACK in a new tab
+      window.open(`https://t.17track.net/en#nums=${encodeURIComponent(num)}`, "_blank");
+      setTimeout(() => setLoading(false), 1000);
+    }
+  };
+
+  const openExternal = () => {
+    const num = trackingNumber.trim();
+    if (num.length >= 5) {
+      window.open(`https://t.17track.net/en#nums=${encodeURIComponent(num)}`, "_blank");
     }
   };
 
   return (
     <>
       <Script
-        src="//www.17track.net/externalcall.js"
-        strategy="lazyOnload"
-        onLoad={() => setScriptLoaded(true)}
+        src="https://www.17track.net/externalcall.js"
+        strategy="afterInteractive"
+        onLoad={handleScriptLoad}
       />
 
       <form onSubmit={handleTrack} className="mx-auto max-w-2xl">
@@ -63,7 +93,7 @@ export function TrackingForm() {
           </div>
           <button
             type="submit"
-            disabled={trackingNumber.trim().length < 5 || !scriptLoaded}
+            disabled={trackingNumber.trim().length < 5}
             className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-blue px-8 py-3.5 text-base font-semibold text-white shadow-sm transition-all hover:bg-brand-blue-dark hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50"
           >
             {loading ? (
@@ -80,8 +110,20 @@ export function TrackingForm() {
 
       {/* Results container */}
       {tracked && (
-        <div className="mx-auto mt-8 max-w-2xl overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-          <div id="YQContainer" className="min-h-[200px]" />
+        <div className="mx-auto mt-8 max-w-2xl">
+          <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+            <div id="YQContainer" className="min-h-[200px]" />
+          </div>
+          <div className="mt-4 text-center">
+            <button
+              type="button"
+              onClick={openExternal}
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-brand-blue transition-colors hover:text-brand-blue-dark hover:underline"
+            >
+              <ExternalLink className="h-3.5 w-3.5" />
+              View on 17TRACK.net for more details
+            </button>
+          </div>
         </div>
       )}
     </>
